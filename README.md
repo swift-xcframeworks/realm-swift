@@ -1,8 +1,8 @@
 # Binary Swift xcframework Package for [Realm Swift](https://github.com/realm/realm-swift)
 
-This is a drop in replacement for the realm/realm-swift source repo that vends binary xcframeorks for direction consumption by the Swift Package Manager.
+This is a drop in replacement for the realm/realm-swift source repo that vends binary xcframeworks for use as dependencies in the Swift Package Manager.
 
-This repo does not reubild realm from sources, but directly repackages the xcframeworks from the realm/realm-swift releases. See the github workflow action in this repo for details on how the processing occurs.
+This repo does not reubild Realm from sources, but directly repackages the pre-built xcframeworks from the realm/realm-swift releases. See the github workflow action in this repo for details on how the processing occurs.
 
 To use, just replace your dependency url to this repo:
 
