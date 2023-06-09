@@ -3,10 +3,10 @@
 import PackageDescription
 
 let realmURL = "https://github.com/swift-xcframeworks/realm-swift/releases/download/v10.40.1/Realm.xcframework.zip"
-let realmChecksum = "0c001ef1d4c2f64d0ea8c68af73f3b83f9b77c79291f7649a98ea82b264145b4"
+let realmChecksum = "a06255377b82859e3b789918de455cd4ca3f0a465161cc7af2cbb4de1fe644c2"
 
 let realmSwiftURL = "https://github.com/swift-xcframeworks/realm-swift/releases/download/v10.40.1/RealmSwift.xcframework.zip"
-let realmSwiftChecksum = "23b84fd0ff0687c10cf0c09d513a0e718c79c1a86d5c5a038c11e236c755577b"
+let realmSwiftChecksum = "602ac179fff7cdb9a65fe4878965b2ecbfadbe86e63976cc607ed6c1478c6d0b"
 
 let package = Package(
     name: "realm-swift",
