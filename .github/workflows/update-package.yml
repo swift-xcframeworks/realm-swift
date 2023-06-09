@@ -1,0 +1,95 @@
+name: Process latest realm-swift release
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # This schedule is set to run every day at midnight. Modify as necessary.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest release
+        id: latest_release
+        run: |
+          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/realm/realm-swift/releases/latest" | jq -r .tag_name)
+          echo "::set-output name=version::${LATEST_RELEASE}"
+
+      - name: Compare with latest release in our repo
+        run: |
+          NEW_VERSION="${{ steps.latest_release.outputs.version }}"
+          CURRENT_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r .tag_name)
+          if [ "$NEW_VERSION" == "$CURRENT_VERSION" ]; then
+            echo "::warning::The latest release from realm/realm-swift is already processed in our repository. Exiting the workflow."
+            exit 1
+          fi
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Download and extract Carthage.xcframework.zip
+        run: |
+          curl -s https://api.github.com/repos/realm/realm-swift/releases/latest \
+          | jq -r ".assets[] | select(.name | test(\"Carthage.xcframework.zip\")) | .browser_download_url" \
+          | xargs curl -LO
+          unzip Carthage.xcframework.zip -d Frameworks
+          rm Carthage.xcframework.zip
+
+      - name: Create new ZIP files
+        run: |
+          cd Frameworks
+          for dir in */
+          do
+            zip --symlinks -r "${dir%/}.zip" "$dir"
+          done
+ 
+      - name: Update Package.swift
+        run: |
+          NEW_VERSION="${{ steps.latest_release.outputs.version }}"
+          CHECKSUM_REALM=$(shasum -a 256 Frameworks/Realm.xcframework.zip | awk '{ print $1 }')
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 Frameworks/RealmSwift.xcframework.zip | awk '{ print $1 }')
+
+          REALM_URL="https://github.com/${{ github.repository }}/releases/download/$NEW_VERSION/Realm.xcframework.zip"
+          REALMSWIFT_URL="https://github.com/${{ github.repository }}/releases/download/$NEW_VERSION/RealmSwift.xcframework.zip"
+
+          sed -i.bak \
+              -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
+              -e "s|let realmChecksum = \".*\"|let realmChecksum = \"$CHECKSUM_REALM\"|" \
+              -e "s|let realmSwiftURL = \".*\"|let realmSwiftURL = \"$REALMSWIFT_URL\"|" \
+              -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
+              Package.swift
+
+          rm Package.swift.bak
+  
+      - name: Commit and push changes
+        run: |
+          git config --local user.email github-actions@github.com
+          git config --local user.name github-actions
+          git add Package.swift
+          git commit -m "Update Package.swift for release ${{ steps.latest_release.outputs.version }}"
+          git push
+          git tag ${{ steps.latest_release.outputs.version }}
+          git push --tags
+  
+      - name: Create new release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ steps.latest_release.outputs.version }}"
+          release_name: "${{ steps.latest_release.outputs.version }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        run: |
+          cd Frameworks
+          for file in *.zip
+          do
+            curl \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: $(file -b --mime-type $file)" \
+              --data-binary @"$file" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=$file"
+          done
