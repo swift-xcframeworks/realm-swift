@@ -17,3 +17,9 @@ To:
 ```swift
  .package(url: "https://github.com/swift-xcframeworks/realm-swift", from: "10.4.0")
 ```
+
+## License
+
+Realm Objective-C & Realm Swift are published under the Apache 2.0 license.  
+Realm Core is also published under the Apache 2.0 license and is available
+[here](https://github.com/realm/realm-core).
