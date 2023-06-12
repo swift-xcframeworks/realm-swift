@@ -2,8 +2,7 @@ name: Process latest realm-swift release
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *' # This schedule is set to run every day at midnight. Modify as necessary.
+  workflow_call:
 
 jobs:
   build:
