@@ -25,6 +25,8 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
 
       - name: Download and extract Carthage.xcframework.zip
         run: |
