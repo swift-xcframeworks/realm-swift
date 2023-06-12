@@ -13,9 +13,10 @@ jobs:
         id: latest_release
         run: |
           LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/realm/realm-swift/releases/latest" | jq -r .tag_name)
-          echo "::set-output name=version::${LATEST_RELEASE}"
+          echo "VERSION=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
 
       - name: Compare with latest release in our repo
+        id: compare_release
         run: |
           NEW_VERSION="${{ steps.latest_release.outputs.version }}"
           CURRENT_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r .tag_name)
@@ -23,7 +24,13 @@ jobs:
             echo "The latest release from realm/realm-swift is already processed in our repository. Exiting the workflow."
             exit 0
           fi
+          echo "CALL_WORKFLOW=true" >> $GITHUB_OUTPUT
+
+      - name: Check out code
+        if: ${{ steps.compare_release.outputs.CALL_WORKFLOW }}
+        uses: actions/checkout@v3
 
       - name: Call the update-package workflow
+        if: ${{ steps.compare_release.outputs.CALL_WORKFLOW }}
         uses: ./.github/workflows/update-package.yml
          
