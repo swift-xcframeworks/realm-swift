@@ -29,6 +29,8 @@ jobs:
       - name: Check out code
         if: ${{ steps.compare_release.outputs.CALL_WORKFLOW }}
         uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
 
       - name: Call the update-package workflow
         if: ${{ steps.compare_release.outputs.CALL_WORKFLOW }}
