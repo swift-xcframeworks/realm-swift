@@ -28,30 +28,25 @@ jobs:
         with:
           repository: ${{ github.repository }}
 
-      - name: Download and extract Carthage.xcframework.zip
+      - name: Download and process frameworks
+        id: process_frameworks
         run: |
-          curl -s https://api.github.com/repos/realm/realm-swift/releases/latest \
-          | jq -r ".assets[] | select(.name | test(\"Carthage.xcframework.zip\")) | .browser_download_url" \
-          | xargs curl -LO
-          unzip Carthage.xcframework.zip -d Frameworks
-          rm Carthage.xcframework.zip
-
-      - name: Create new ZIP files
-        run: |
-          cd Frameworks
-          for dir in */
-          do
-            zip --symlinks -r "${dir%/}.zip" "$dir"
+          ASSET_URLS=$(curl -s https://api.github.com/repos/realm/realm-swift/releases/latest | jq -r '.assets[] | select(.name | endswith(".xcframework.zip")) | .browser_download_url')
+          for url in $ASSET_URLS; do
+            curl -sLJO $url
+            FILENAME=$(basename $url)
+            SHA256_HASH=$(shasum -a 256 $FILENAME | cut -f 1 -d ' ')
+            echo "::set-output name=${FILENAME%%.zip}::$SHA256_HASH"
           done
  
       - name: Update Package.swift
         run: |
           NEW_VERSION="${{ steps.latest_release.outputs.version }}"
-          CHECKSUM_REALM=$(shasum -a 256 Frameworks/Realm.xcframework.zip | awk '{ print $1 }')
-          CHECKSUM_REALMSWIFT=$(shasum -a 256 Frameworks/RealmSwift.xcframework.zip | awk '{ print $1 }')
+          CHECKSUM_REALM=$(shasum -a 256 Realm.xcframework.zip | awk '{ print $1 }')
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 RealmSwift@15.0.xcframework.zip | awk '{ print $1 }')
 
-          REALM_URL="https://github.com/${{ github.repository }}/releases/download/$NEW_VERSION/Realm.xcframework.zip"
-          REALMSWIFT_URL="https://github.com/${{ github.repository }}/releases/download/$NEW_VERSION/RealmSwift.xcframework.zip"
+          REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.xcframework.zip"
+          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift.xcframework.zip"
 
           sed -i.bak \
               -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
