@@ -46,7 +46,7 @@ jobs:
           CHECKSUM_REALMSWIFT=$(shasum -a 256 RealmSwift@15.0.xcframework.zip | awk '{ print $1 }')
 
           REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.xcframework.zip"
-          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift.xcframework.zip"
+          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.xcframework.zip"
 
           sed -i.bak \
               -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
@@ -77,15 +77,3 @@ jobs:
           release_name: "${{ steps.latest_release.outputs.version }}"
           draft: false
           prerelease: false
-
-      - name: Upload Release Assets
-        run: |
-          cd Frameworks
-          for file in *.zip
-          do
-            curl \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Content-Type: $(file -b --mime-type $file)" \
-              --data-binary @"$file" \
-              "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=$file"
-          done
