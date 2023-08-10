@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Update Package.swift
         run: |
+          ls -l downloads
+          ls -al
           NEW_VERSION="${{ needs.check_for_updates.outputs.latest-version }}"
           CHECKSUM_REALM=$(shasum -a 256 downloads/Realm.xcframework.zip | awk '{ print $1 }')
           CHECKSUM_REALMSWIFT=$(shasum -a 256 downloads/RealmSwift@15.0.xcframework.zip | awk '{ print $1 }')
