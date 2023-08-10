@@ -61,3 +61,4 @@ jobs:
           for url in $ASSET_URLS; do
             (cd downloads; curl -sLJO $url)
           done
+          ls -l downloads
