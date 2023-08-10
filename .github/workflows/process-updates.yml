@@ -11,9 +11,36 @@ jobs:
     uses: ./.github/workflows/check-for-update.yml
     with:
       source-repo: 'realm/realm-swift'
-  process_latest_release:
-    name: "Process the latest release"
+
+  update_package:
+    name: "Update Package.swift"
     needs: check_for_updates
     if: ${{ needs.check_for_updates.outputs.needs-update == true }}
-    uses: ./.github/workflows/update-package.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Package.swift
+        run: |
+          NEW_VERSION="${{ needs.check_for_updates.outputs.latest-version }}"
+          CHECKSUM_REALM=$(shasum -a 256 downloads/Realm.xcframework.zip | awk '{ print $1 }')
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 downloads/RealmSwift@15.0.xcframework.zip | awk '{ print $1 }')
+
+          REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.xcframework.zip"
+          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.xcframework.zip"
+
+          sed -i.bak \
+              -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
+              -e "s|let realmChecksum = \".*\"|let realmChecksum = \"$CHECKSUM_REALM\"|" \
+              -e "s|let realmSwiftURL = \".*\"|let realmSwiftURL = \"$REALMSWIFT_URL\"|" \
+              -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
+              Package.swift
+
+          rm Package.swift.bak
+
+  process_latest_release:
+    name: "Process the latest release"
+    needs: [ check_for_updates, update_package ]
+    if: ${{ needs.check_for_updates.outputs.needs-update == true }}
+    uses: ./.github/workflows/create-release.yml
+    with:
+      version: ${{ needs.check_for_updates.outputs.latest-version }}
 
