@@ -31,7 +31,7 @@ jobs:
       - name: Compare with latest release in our repo
         id: compare_release
         run: |
-          NEW_VERSION="${{ steps.latest_release.outputs.version }}"
+          NEW_VERSION="${{ steps.latest_release.outputs.latest-version }}"
           CURRENT_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r .tag_name)
           if [ "$NEW_VERSION" == "$CURRENT_VERSION" ]; then
             echo "The latest release from ${{ inputs.source-repo }} is already processed in our repository. Exiting the workflow."
