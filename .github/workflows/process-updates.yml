@@ -15,7 +15,7 @@ jobs:
   update_package:
     name: "Update Package.swift"
     needs: check_for_updates
-    if: ${{ needs.check_for_updates.outputs.needs-update == true }}
+    if: needs.check_for_updates.outputs.needs-update == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Update Package.swift
