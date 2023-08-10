@@ -1,4 +1,4 @@
-name: Process updates ffrom realm/realm-swift repository
+name: Process updates from realm/realm-swift repository
 
 on:
   workflow_dispatch:
@@ -7,7 +7,13 @@ on:
 
 jobs:
   check_for_updates:
-    name: Call the update-package workflow
+    name: "Call the update-package workflow"
     uses: ./.github/workflows/check-for-update.yml
     with:
       source-repo: 'realm/realm-swift'
+  process_latest_release:
+    name: "Process the latest release"
+    needs: check_for_updates
+    if: ${{ needs.check_for_updates.outputs.needs-update }}
+    uses: ./.github/workflows/update-package.yml
+
