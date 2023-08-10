@@ -7,10 +7,20 @@ on:
         description: 'Source repository to check'
         required: true
         type: string
+    outputs:
+      latest-version:
+        description: "The latest relase of the source repository"
+        value: ${{ jobs.check-version.outputs.latest-version }}
+      needs-update:
+        description: "True if the latest version is not our latest version"
+        value:  ${{ jobs.check-version.outputs.needs-update }}
 
 jobs:
-  build:
+  check-version:
     runs-on: ubuntu-latest
+    outputs:
+      latest-version: ${{ steps.latest_release.outputs.VERSION }}
+      needs-update: ${{ steps.compare_release.outcome.CALL_WORKFLOW }}
     steps:
       - name: Get latest release
         id: latest_release
