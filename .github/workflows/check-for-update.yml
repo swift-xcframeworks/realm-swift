@@ -47,7 +47,7 @@ jobs:
           echo " Needs update is set to ${{ steps.compare_release.outputs.needs-update}}"
 
       - name: Check out code
-        if: steps.compare_release.outputs.needs-update
+        if: steps.compare_release.outputs.needs-update == 'true'
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository }}    
