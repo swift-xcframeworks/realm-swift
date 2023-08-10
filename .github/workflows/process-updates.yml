@@ -36,8 +36,8 @@ jobs:
 
           rm Package.swift.bak
 
-  process_latest_release:
-    name: "Process the latest release"
+  create_release:
+    name: "Create a new release"
     needs: [ check_for_updates, update_package ]
     if: ${{ needs.check_for_updates.outputs.needs-update == true }}
     uses: ./.github/workflows/create-release.yml
