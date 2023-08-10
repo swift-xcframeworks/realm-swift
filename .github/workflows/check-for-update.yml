@@ -42,6 +42,10 @@ jobs:
             echo "$GITHUB_OUTPUT"
           fi
 
+      - name: Print out stuff
+        run: |
+          echo " Needs update is set to ${{ steps.compare_release.outputs.needs-update}}"
+          
       - name: Check out code
         if: steps.compare_release.outputs.needs-update == true
         uses: actions/checkout@v3
