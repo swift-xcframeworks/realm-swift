@@ -39,3 +39,8 @@ jobs:
           else
             echo "needs-update=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: "Download xcframeworks"
+        if: ${{ steps.compare_release.outputs.needs-update == true }}
+        run: |
+          echo "Will download zips"
