@@ -14,6 +14,6 @@ jobs:
   process_latest_release:
     name: "Process the latest release"
     needs: check_for_updates
-    if: ${{ needs.check_for_updates.outputs.needs-update }}
+    if: ${{ needs.check_for_updates.outputs.needs-update == true }}
     uses: ./.github/workflows/update-package.yml
 
