@@ -37,7 +37,9 @@ jobs:
             echo "The latest release from ${{ inputs.source-repo }} is already processed in our repository. Exiting the workflow."
             echo "needs-update=false" >> $GITHUB_OUTPUT
           else
+            echo "Needs an update"
             echo "needs-update=true" >> $GITHUB_OUTPUT
+            echo "$GITHUB_OUTPUT"
           fi
 
       - name: Check out code
