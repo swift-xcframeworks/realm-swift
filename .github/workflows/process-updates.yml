@@ -1,0 +1,13 @@
+name: Process updates ffrom realm/realm-swift repository
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # This schedule is set to run every day at midnight. Modify as necessary.
+
+jobs:
+  check_for_updates:
+    name: Call the update-package workflow
+    uses: ./.github/workflows/check-for-update.yml
+    with:
+      source-repo: 'realm/realm-swift'
