@@ -38,7 +38,7 @@ jobs:
             echo "needs-update=false" >> $GITHUB_OUTPUT
           else
             echo "Needs an update"
-            echo "needs-update=true" >> $GITHUB_OUTPUT
+            echo "needs-update=false" >> $GITHUB_OUTPUT
             echo "$GITHUB_OUTPUT"
           fi
 
