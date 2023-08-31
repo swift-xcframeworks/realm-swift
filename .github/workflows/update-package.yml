@@ -42,11 +42,11 @@ jobs:
       - name: Update Package.swift
         run: |
           NEW_VERSION="${{ steps.latest_release.outputs.version }}"
-          CHECKSUM_REALM=$(shasum -a 256 Realm.xcframework.zip | awk '{ print $1 }')
-          CHECKSUM_REALMSWIFT=$(shasum -a 256 RealmSwift@15.0.xcframework.zip | awk '{ print $1 }')
+          CHECKSUM_REALM=$(shasum -a 256 Realm.spm.zip | awk '{ print $1 }')
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 RealmSwift@15.0.spm.zip | awk '{ print $1 }')
 
-          REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.xcframework.zip"
-          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.xcframework.zip"
+          REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.spm.zip"
+          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.spm.zip"
 
           sed -i.bak \
               -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
@@ -56,6 +56,15 @@ jobs:
               Package.swift
 
           rm Package.swift.bak
+
+          sed -i.bak \
+              -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
+              -e "s|let realmChecksum = \".*\"|let realmChecksum = \"$CHECKSUM_REALM\"|" \
+              -e "s|let realmSwiftURL = \".*\"|let realmSwiftURL = \"$REALMSWIFT_URL\"|" \
+              -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
+              Package@swift-5.9.swift
+
+          rm Package@swift-5.9.swift
   
       - name: Commit and push changes
         run: |
