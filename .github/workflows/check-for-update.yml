@@ -1,4 +1,4 @@
-name: Check for update from realm/realm-swift repository
+name: Check for update from repository
 
 on:
   workflow_call:
@@ -39,26 +39,5 @@ jobs:
           else
             echo "Needs an update"
             echo "needs-update=true" >> $GITHUB_OUTPUT
-            echo "$GITHUB_OUTPUT"
+            cat "$GITHUB_OUTPUT"
           fi
-
-      - name: Print out stuff
-        run: |
-          echo " Needs update is set to ${{ steps.compare_release.outputs.needs-update}}"
-
-      - name: Check out code
-        if: steps.compare_release.outputs.needs-update == 'true'
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ github.repository }}    
-
-      - name: "Download xcframeworks"
-        if: steps.compare_release.outputs.needs-update == 'true'
-        id: download_xcframeworks
-        run: |
-          mkdir downloads
-          ASSET_URLS=$(curl -s https://api.github.com/repos/realm/realm-swift/releases/latest | jq -r '.assets[] | select(.name | endswith(".xcframework.zip")) | .browser_download_url')
-          for url in $ASSET_URLS; do
-            (cd downloads; curl -sLJO $url)
-          done
-          ls -l downloads
