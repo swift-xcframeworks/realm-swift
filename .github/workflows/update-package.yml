@@ -35,28 +35,36 @@ jobs:
         run: |
           NEW_VERSION="${{ needs.check_for_updates.outputs.latest-version }}"
           CHECKSUM_REALM=$(shasum -a 256 downloads/Realm.spm.zip | awk '{ print $1 }')
-          CHECKSUM_REALMSWIFT=$(shasum -a 256 downloads/RealmSwift@15.0.spm.zip | awk '{ print $1 }')
-
           REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.spm.zip"
-          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.spm.zip"
 
-          sed -i.bak \
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 downloads/RealmSwift@14.3.1.spm.zip | awk '{ print $1 }')
+          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@14.3.1.spm.zip"
+
+          sed -i \
               -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
               -e "s|let realmChecksum = \".*\"|let realmChecksum = \"$CHECKSUM_REALM\"|" \
               -e "s|let realmSwiftURL = \".*\"|let realmSwiftURL = \"$REALMSWIFT_URL\"|" \
               -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
               Package.swift
 
-          rm Package.swift.bak
+            sed -i \
+              -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
+              -e "s|let realmChecksum = \".*\"|let realmChecksum = \"$CHECKSUM_REALM\"|" \
+              -e "s|let realmSwiftURL = \".*\"|let realmSwiftURL = \"$REALMSWIFT_URL\"|" \
+              -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
+              Package@swift-5.8.swift
 
-          sed -i.bak \
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 downloads/RealmSwift@15.0.spm.zip | awk '{ print $1 }')
+          REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.spm.zip"
+
+          sed -i \
               -e "s|let realmURL = \".*\"|let realmURL = \"$REALM_URL\"|" \
               -e "s|let realmChecksum = \".*\"|let realmChecksum = \"$CHECKSUM_REALM\"|" \
               -e "s|let realmSwiftURL = \".*\"|let realmSwiftURL = \"$REALMSWIFT_URL\"|" \
               -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
               Package@swift-5.9.swift
 
-          rm Package@swift-5.9.swift.bak
+
   
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
