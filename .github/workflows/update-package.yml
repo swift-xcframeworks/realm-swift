@@ -39,7 +39,7 @@ jobs:
             echo "::set-output name=${FILENAME%%.zip}::$SHA256_HASH"
           done
  
-      - name: Update Package.swift
+      - name: Update Package.swift files.
         run: |
           NEW_VERSION="${{ steps.latest_release.outputs.version }}"
           CHECKSUM_REALM=$(shasum -a 256 Realm.spm.zip | awk '{ print $1 }')
@@ -66,15 +66,10 @@ jobs:
 
           rm Package@swift-5.9.swift
   
-      - name: Commit and push changes
-        run: |
-          git config --local user.email github-actions@github.com
-          git config --local user.name github-actions
-          git add Package.swift
-          git commit -m "Update Package.swift for release ${{ steps.latest_release.outputs.version }}"
-          git push
-          git tag ${{ steps.latest_release.outputs.version }}
-          git push --tags
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Updates Package.swift files for release ${{ steps.latest_release.outputs.version }}
+          tagging_message: ${{ steps.latest_release.outputs.version }}
   
       - name: Create new release
         id: create_release
