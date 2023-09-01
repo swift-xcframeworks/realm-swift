@@ -58,7 +58,7 @@ jobs:
               -e "s|let realmSwiftChecksum = \".*\"|let realmSwiftChecksum = \"$CHECKSUM_REALMSWIFT\"|" \
               Package@swift-5.9.swift
 
-          rm Package@swift-5.9.swift
+          rm Package@swift-5.9.swift.bak
   
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
