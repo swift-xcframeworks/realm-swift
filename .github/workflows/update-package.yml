@@ -25,19 +25,17 @@ jobs:
       - name: Download and process frameworks
         id: process_frameworks
         run: |
-          ASSET_URLS=$(curl -s https://api.github.com/repos/realm/realm-swift/releases/latest | jq -r '.assets[] | select(.name | endswith(".xcframework.zip")) | .browser_download_url')
+          mkdir downloads
+          ASSET_URLS=$(curl -s https://api.github.com/repos/realm/realm-swift/releases/latest | jq -r '.assets[] | select(.name | endswith(".spm.zip")) | .browser_download_url')
           for url in $ASSET_URLS; do
-            curl -sLJO $url
-            FILENAME=$(basename $url)
-            SHA256_HASH=$(shasum -a 256 $FILENAME | cut -f 1 -d ' ')
-            echo "::set-output name=${FILENAME%%.zip}::$SHA256_HASH"
+            (cd downloads; curl -sLJO $url)
           done
  
       - name: Update Package.swift files.
         run: |
           NEW_VERSION="${{ needs.check_for_updates.outputs.latest-version }}"
-          CHECKSUM_REALM=$(shasum -a 256 Realm.spm.zip | awk '{ print $1 }')
-          CHECKSUM_REALMSWIFT=$(shasum -a 256 RealmSwift@15.0.spm.zip | awk '{ print $1 }')
+          CHECKSUM_REALM=$(shasum -a 256 downloads/Realm.spm.zip | awk '{ print $1 }')
+          CHECKSUM_REALMSWIFT=$(shasum -a 256 downloads/RealmSwift@15.0.spm.zip | awk '{ print $1 }')
 
           REALM_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/Realm.spm.zip"
           REALMSWIFT_URL="https://github.com/realm/realm-swift/releases/download/$NEW_VERSION/RealmSwift@15.0.spm.zip"
