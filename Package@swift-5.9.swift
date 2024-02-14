@@ -2,10 +2,10 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 import PackageDescription
 
-let realmURL = "https://github.com/realm/realm-swift/releases/download/v10.46.0/Realm.spm.zip"
-let realmChecksum = "a2d8978b65757e862af326846b550c2e314f821fb7485573b72ac18c2d20006c"
+let realmURL = "https://github.com/realm/realm-swift/releases/download/v10.47.0/Realm.spm.zip"
+let realmChecksum = "299022a7db5c1870d4689ea6aa1dfc3213c0bc61b06eabfc610744449ccd38f1"
 
-let realmSwiftURL = "https://github.com/realm/realm-swift/releases/download/v10.46.0/RealmSwift@15.0.spm.zip"
+let realmSwiftURL = "https://github.com/realm/realm-swift/releases/download/v10.47.0/RealmSwift@15.0.spm.zip"
 let realmSwiftChecksum = ""
 
 let package = Package(
